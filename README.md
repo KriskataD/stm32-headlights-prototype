@@ -5,9 +5,19 @@ Firmware prototype for an automotive lighting controller targeting the STM32F413
 ## What It Does
 
 - **Headlights** — PWM-controlled high-beam and low-beam outputs. Beam selection is commanded over CAN bus (IDs: `CAN_ID_HIGH`, `CAN_ID_LOW`, `CAN_ID_OFF`).
-- **Turn indicators / hazard** — Left, right, and hazard (both) blink patterns driven by GPIO switch inputs, toggled at 100 ms intervals inside a FreeRTOS task.
-- **Power monitoring** — INA219 current/voltage sensor read over I2C; reports shunt voltage, bus voltage, current, and power.
-- **Self-test on boot** — An event-group flag gates a headlights and indicators test sequence before the RTOS scheduler starts.
+- **Turn indicators / hazard** — Left, right, and hazard (both) blink patterns driven by GPIO switch inputs, toggled at a fixed 100 ms cadence by a dedicated FreeRTOS task.
+- **Power monitoring** — INA219 current/voltage sensor read over I2C in master mode by a periodic polling task; exposes the latest shunt voltage, bus voltage, and current.
+- **Self-test on boot** — A compile-time flag (`RUN_BOOT_SELFTEST` in `main.h`) gates a headlights and indicators test sequence that runs before the RTOS scheduler starts.
+
+## Firmware Architecture (FreeRTOS tasks)
+
+The application runs three independent CMSIS-OS v1 tasks, each owning a single input/output path (no shared event bus — each task reads its own input and drives its own output):
+
+| Task | Priority | Cadence | Responsibility |
+|---|---|---|---|
+| `StartCAN_Task` | Idle | ~1 ms poll | Reads CAN RX FIFO0 and sets the beam PWM (`TIM1` CCR1/CCR2) from `CAN_ID_HIGH` / `CAN_ID_LOW` / `CAN_ID_OFF`. Sole writer of the beam outputs. |
+| `StartIndicators_Task` | Normal | 100 ms | Samples the left/right switch inputs and toggles the indicator LEDs (left, right, hazard). |
+| `StartINA219_Task` | Low | 500 ms | Polls the INA219 over I2C (master mode) and stores the latest bus voltage, shunt voltage (signed µV), and current. |
 
 ## Hardware Architecture
 
@@ -32,9 +42,9 @@ Firmware prototype for an automotive lighting controller targeting the STM32F413
 | Layer | Details |
 |---|---|
 | MCU | STM32F413ZH @ 70 MHz (HSE + PLL) |
-| RTOS | FreeRTOS via CMSIS-OS v1 — three tasks: Updates, Handler, CAN |
-| CAN bus | CAN1, normal mode, interrupt-driven RX FIFO 0 |
-| I2C | I2C1 @ 100 kHz, interrupt-driven slave/master mode |
+| RTOS | FreeRTOS via CMSIS-OS v1 — three tasks: CAN, Indicators, INA219 |
+| CAN bus | CAN1, normal mode, accept-all RX filter on FIFO 0 |
+| I2C | I2C1 @ 100 kHz, master mode (reads the INA219) |
 | PWM output | TIM1 CH1 & CH2, 1 kHz, 0–100% duty cycle |
 | PWM input capture | TIM2 & TIM3, input capture mode |
 | Power monitor | INA219 (Texas Instruments) — 32 V / 2 A calibration |
