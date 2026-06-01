@@ -60,7 +60,7 @@ Middlewares/        — FreeRTOS (generated)
 ## Known Limitations
 
 - **No hardware available for testing.** This is a portfolio/prototype codebase. Logic has been reviewed for correctness but has not been validated on physical hardware.
-- The INA219 is read in master mode (`ina219.c`). The driver's master-mode read functions are present but not yet consumed by a runtime task; a periodic polling task is the natural next step.
+- The INA219 is read in master mode (`ina219.c`) by a periodic polling task that stores the latest bus voltage, shunt voltage, and current in a global. Those values are not yet consumed downstream (e.g. reported over CAN or displayed).
 - A single accept-all CAN filter (ID=0, mask=0) is configured; all incoming IDs reach FIFO0 and are dispatched in software by `StdId`.
 - **PA0/PA6 are double-configured.** Both pins are set up as TIM2/TIM3 PWM input-capture channels (see `.ioc`) and are *also* read as digital GPIO in `headlights.c`. The intended role of these pins (beam-emission feedback vs. control input) isn't settled, so the conflicting GPIO read is left in place and flagged here rather than removed.
 - Stack sizes for FreeRTOS tasks (128 words each) are minimal and untested under load.
