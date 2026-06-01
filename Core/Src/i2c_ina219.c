@@ -47,6 +47,7 @@ void HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *hi2c)
 	        // Process received data here
 	        uint8_t receivedRegister = Register[registerIndex];
 	        registerIndex++;
+	        if (registerIndex >= (sizeof(Register) / sizeof(Register[0]))) registerIndex = 0;
 	        uint16_t regValue = Read16(&ina219, receivedRegister);
 	        RxData[0] = (regValue >> 8) & 0xff;
 	        RxData[1] = regValue & 0xff;
