@@ -67,6 +67,21 @@ Drivers/            — STM32 HAL & CMSIS (generated)
 Middlewares/        — FreeRTOS (generated)
 ```
 
+## Building
+
+This is an [STM32CubeIDE](https://www.st.com/en/development-tools/stm32cubeide.html) project targeting the **STM32F413ZH** (e.g. the NUCLEO-F413ZH board).
+
+1. **Clone** the repository.
+2. **Import** into STM32CubeIDE: *File → Import → Existing Projects into Workspace*, and select the repository root.
+3. **Build**: *Project → Build All* (`Ctrl+B`). The `arm-none-eabi-gcc` toolchain ships with CubeIDE.
+4. **Flash / debug**: connect the board via ST-LINK and *Run → Debug* to program and start a debug session.
+
+The peripheral configuration can be inspected or regenerated from `HeadlightsPrototype.ioc` with STM32CubeMX. To skip the power-on lamp self-test, set `RUN_BOOT_SELFTEST` to `0` in `Core/Inc/main.h`.
+
+## License
+
+Released under the [MIT License](LICENSE). Bundled third-party code — STMicroelectronics HAL/CMSIS (`Drivers/`) and FreeRTOS (`Middlewares/`) — retains its own license terms.
+
 ## Known Limitations
 
 - **No hardware available for testing.** This is a portfolio/prototype codebase. Logic has been reviewed for correctness but has not been validated on physical hardware.
