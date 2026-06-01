@@ -63,5 +63,5 @@ Middlewares/        — FreeRTOS (generated)
 
 - **No hardware available for testing.** This is a portfolio/prototype codebase. Logic has been reviewed for correctness but has not been validated on physical hardware.
 - The I2C driver mixes master-transmit and slave-receive callbacks in a way that reflects early-stage exploration; a production design would separate these roles cleanly.
-- No CAN acceptance filter is configured, so the controller accepts all CAN IDs.
+- A single accept-all CAN filter (ID=0, mask=0) is configured; all incoming IDs reach FIFO0 and are dispatched in software by `StdId`.
 - Stack sizes for FreeRTOS tasks (128 words each) are minimal and untested under load.

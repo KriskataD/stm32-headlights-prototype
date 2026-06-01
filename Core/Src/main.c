@@ -81,7 +81,7 @@ void StartHandlerTask(void const * argument);
 void StartCAN_Task(void const * argument);
 
 /* USER CODE BEGIN PFP */
-
+static void MX_CAN_Filter_Config(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -194,6 +194,7 @@ int main(void)
 	actions[0] = Headlights_Handle;
 	actions[1] = Indicators_Handle;
 
+	MX_CAN_Filter_Config();
 	HAL_CAN_Start(&hcan1);
 	HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
 
@@ -687,6 +688,34 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+/**
+  * @brief Configure and activate a CAN acceptance filter.
+  * @note  Without an activated filter, bxCAN drops every incoming frame and
+  *        the RX FIFO never fills. Bank 0 is set to IDMASK with ID=0/mask=0,
+  *        so all standard IDs pass; dispatch by ID happens in StartCAN_Task.
+  * @retval None
+  */
+static void MX_CAN_Filter_Config(void)
+{
+  CAN_FilterTypeDef sFilterConfig;
+
+  sFilterConfig.FilterBank           = 0;
+  sFilterConfig.FilterMode           = CAN_FILTERMODE_IDMASK;
+  sFilterConfig.FilterScale          = CAN_FILTERSCALE_32BIT;
+  sFilterConfig.FilterIdHigh         = 0x0000;
+  sFilterConfig.FilterIdLow          = 0x0000;
+  sFilterConfig.FilterMaskIdHigh     = 0x0000;
+  sFilterConfig.FilterMaskIdLow      = 0x0000;
+  sFilterConfig.FilterFIFOAssignment = CAN_RX_FIFO0;
+  sFilterConfig.FilterActivation     = CAN_FILTER_ENABLE;
+  sFilterConfig.SlaveStartFilterBank = 14;
+
+  if (HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+}
 
 /* USER CODE END 4 */
 
