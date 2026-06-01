@@ -116,60 +116,6 @@ static EventGroupHandle_t xHeadEventGroup;
 
 INA219_t ina219;
 
-uint32_t a;
-uint32_t b;
-
-//int _write(int file, char *ptr, int len)
-//{
-//	int i = 0;
-//	for (i = 0; i < len; i++)
-//	{
-//		ITM_SendChar( (*ptr++) );
-//		return len;
-//	}
-//}
-
-
-//void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan) {
-//    CAN_RxHeaderTypeDef rxHeader;
-//    CAN_MessageData rxData;
-//
-//    if (HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &rxHeader, rxData.bytes) == HAL_OK)
-//    {
-//    	// Check the CAN message ID
-//    			          switch (rxHeader.StdId)
-//    			          {
-//    			            case CAN_ID_LOW:
-//    			              if (rxHeader.DLC == 1)
-//    			              {
-//    			                // Turn on low beam
-//    			                TIM1->CCR1 = 0;
-//    			                TIM1->CCR2 = 100;
-//    			              }
-//    			              break;
-//
-//    			            case CAN_ID_HIGH:
-//    			              if (rxHeader.DLC == 1)
-//    			              {
-//    			                // Turn on high beam
-//    			                TIM1->CCR1 = 100;
-//    			                TIM1->CCR2 = 0;
-//    			              }
-//    			              break;
-//
-//    			            case CAN_ID_OFF:
-//    			              if (rxHeader.DLC == 1)
-//    			              {
-//    			                // Turn off the headlights
-//    			                TIM1->CCR1 = 0;
-//    			                TIM1->CCR2 = 0;
-//    			              }
-//    			              break;
-//    			           }
-//    }
-//}
-
-
 /* USER CODE END 0 */
 
 /**
@@ -836,21 +782,12 @@ void StartCAN_Task(void const * argument)
 {
   /* USER CODE BEGIN StartCAN_Task */
 
-	CAN_RxHeaderTypeDef rxHeader; //store CAN message
+	CAN_RxHeaderTypeDef rxHeader;
 	CAN_MessageData rxData;
-//	HeadlightsStates_t currentAction;
-
 
   /* Infinite loop */
   for(;;)
   {
-	  //printf("RXFIFO value:%u\n", HAL_CAN_GetRxFifoFillLevel(&hcan1, CAN_RX_FIFO0));
-// activeate interrupt and then printf
-	  // Check if a CAN message has been received
-//	  a = HAL_CAN_GetRxFifoFillLevel(&hcan1, CAN_RX_FIFO0);
-//	  b = HAL_CAN_GetRxFifoFillLevel(&hcan1, CAN_RX_FIFO1);
-//	  printf("value a:%lu\n", a);
-//	  printf("value b:%lu\n", b);
 	  if (HAL_CAN_GetRxFifoFillLevel(&hcan1, CAN_RX_FIFO0) > 0)
 	      {
 	        // Receive the CAN message
