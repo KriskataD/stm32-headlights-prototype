@@ -198,7 +198,7 @@ int main(void)
 	HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
 
 	//Initialize INA219
-	if (INA219_Init(&ina219, &hi2c1, INA219_ADDRESS) != HAL_OK)
+	if (INA219_Init(&ina219, &hi2c1, INA219_ADDRESS) == 0)
 	    {
 			Error_Handler();
 	    }
