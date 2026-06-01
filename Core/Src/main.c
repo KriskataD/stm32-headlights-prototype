@@ -62,6 +62,7 @@ DMA_HandleTypeDef hdma_tim1_ch2;
 osThreadId UpdatesHandle;
 osThreadId HandlerHandle;
 osThreadId CANHandle;
+osThreadId INA219Handle;
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -78,6 +79,7 @@ static void MX_I2C1_Init(void);
 void StartUpdatesTask(void const * argument);
 void StartHandlerTask(void const * argument);
 void StartCAN_Task(void const * argument);
+void StartINA219_Task(void const * argument);
 
 /* USER CODE BEGIN PFP */
 static void MX_CAN_Filter_Config(void);
@@ -113,6 +115,13 @@ typedef union
 static QueueHandle_t Queue_Handle = NULL;
 
 INA219_t ina219;
+
+typedef struct {
+	uint16_t busVoltage_mV;   // bus voltage, LSB 4 mV
+	uint16_t shuntVoltage;    // shunt voltage, scaled
+	int16_t  current_mA;      // current in mA
+} INA219_Readings_t;
+static volatile INA219_Readings_t ina219_readings;
 
 /* USER CODE END 0 */
 
@@ -233,7 +242,9 @@ int main(void)
   CANHandle = osThreadCreate(osThread(CAN), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
-	/* add threads, ... */
+  /* definition and creation of INA219 polling thread */
+  osThreadDef(INA219, StartINA219_Task, osPriorityLow, 0, 128);
+  INA219Handle = osThreadCreate(osThread(INA219), NULL);
   /* USER CODE END RTOS_THREADS */
 
   /* Start scheduler */
@@ -842,6 +853,28 @@ void StartCAN_Task(void const * argument)
     osDelay(1);
   }
   /* USER CODE END StartCAN_Task */
+}
+
+/* USER CODE BEGIN Header_StartINA219_Task */
+/**
+* @brief Function implementing the INA219 polling thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartINA219_Task */
+void StartINA219_Task(void const * argument)
+{
+  /* USER CODE BEGIN StartINA219_Task */
+  /* Infinite loop */
+  for(;;)
+  {
+	  ina219_readings.busVoltage_mV = INA219_ReadBusVoltage(&ina219);
+	  ina219_readings.shuntVoltage  = INA219_ReadShuntVolage(&ina219);
+	  ina219_readings.current_mA    = INA219_ReadCurrent(&ina219);
+
+	  osDelay(500);
+  }
+  /* USER CODE END StartINA219_Task */
 }
 
 /**
