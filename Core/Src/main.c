@@ -59,8 +59,6 @@ TIM_HandleTypeDef htim3;
 DMA_HandleTypeDef hdma_tim1_ch1;
 DMA_HandleTypeDef hdma_tim1_ch2;
 
-osThreadId UpdatesHandle;
-osThreadId HandlerHandle;
 osThreadId CANHandle;
 osThreadId INA219Handle;
 osThreadId IndicatorsHandle;
@@ -77,8 +75,6 @@ static void MX_TIM3_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_CAN1_Init(void);
 static void MX_I2C1_Init(void);
-void StartUpdatesTask(void const * argument);
-void StartHandlerTask(void const * argument);
 void StartCAN_Task(void const * argument);
 void StartINA219_Task(void const * argument);
 void StartIndicators_Task(void const * argument);
@@ -90,22 +86,6 @@ static void MX_CAN_Filter_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-typedef void (*stateAction)();
-typedef bool (*stateUpdate)();
-static stateAction actions[ACTION_HANDLERS_SIZE];
-static stateUpdate updates[UPDATE_HANDLERS_SIZE];
-
-typedef enum {
-	HEADLIGHTS = 1, INDICATORS
-} evt_t;
-
-typedef enum {
-	GPIO = 1, CAN
-} evtSrc_t;
-typedef struct {
-	evt_t evt;
-	evtSrc_t src;
-} InputEvt_t;
 typedef union
 {
 	uint8_t bytes[8];    // Access as an array of 8 bytes
@@ -113,8 +93,6 @@ typedef union
 	uint32_t u32[2];     // Access as an array of 2 unsigned 32-bit integers
 	float f[2];          // Access as an array of 2 floats
 }CAN_MessageData;
-
-static QueueHandle_t Queue_Handle = NULL;
 
 INA219_t ina219;
 
@@ -190,11 +168,6 @@ int main(void)
 	Headlights_Init(highBeam, lowBeam);
 	Indicators_Init(leftInd, rightInd);
 
-	Queue_Handle = xQueueCreate(1, sizeof(InputEvt_t));
-
-	updates[0] = Headlights_Updates;
-	actions[0] = Headlights_Handle;
-
 	MX_CAN_Filter_Config();
 	HAL_CAN_Start(&hcan1);
 	HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
@@ -229,14 +202,6 @@ int main(void)
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* definition and creation of Updates */
-  osThreadDef(Updates, StartUpdatesTask, osPriorityNormal, 0, 128);
-  UpdatesHandle = osThreadCreate(osThread(Updates), NULL);
-
-  /* definition and creation of Handler */
-  osThreadDef(Handler, StartHandlerTask, osPriorityIdle, 0, 128);
-  HandlerHandle = osThreadCreate(osThread(Handler), NULL);
-
   /* definition and creation of CAN */
   osThreadDef(CAN, StartCAN_Task, osPriorityIdle, 0, 128);
   CANHandle = osThreadCreate(osThread(CAN), NULL);
@@ -719,70 +684,6 @@ static void MX_CAN_Filter_Config(void)
 }
 
 /* USER CODE END 4 */
-
-/* USER CODE BEGIN Header_StartUpdatesTask */
-/**
- * @brief  Function implementing the Updates thread.
- * @param  argument: Not used
- * @retval None
- */
-/* USER CODE END Header_StartUpdatesTask */
-void StartUpdatesTask(void const * argument)
-{
-  /* USER CODE BEGIN 5 */
-	/* Infinite loop */
-	for (;;) {
-
-		InputEvt_t eventSend;
-		for (int i = 0; i < UPDATE_HANDLERS_SIZE; i++)
-		{
-			if (i == 0)
-			{
-					if (updates[i]())
-					{
-						eventSend.evt = HEADLIGHTS;
-						eventSend.src = GPIO;
-						xQueueSend(Queue_Handle, &eventSend, portMAX_DELAY);
-					}
-			}
-
-		}
-
-		osDelay(10);
-	}
-  /* USER CODE END 5 */
-}
-
-/* USER CODE BEGIN Header_StartHandlerTask */
-/**
- * @brief Function implementing the Handler thread.
- * @param argument: Not used
- * @retval None
- */
-/* USER CODE END Header_StartHandlerTask */
-void StartHandlerTask(void const * argument)
-{
-  /* USER CODE BEGIN StartHandlerTask */
-	/* Infinite loop */
-	for (;;) {
-
-		InputEvt_t eventReceive;
-		xQueueReceive(Queue_Handle, &eventReceive, 50);
-		for (int i = 0; i < ACTION_HANDLERS_SIZE; i++)
-		{
-			switch (eventReceive.evt)
-			{
-			case HEADLIGHTS:
-				if (i == 0)
-				{
-					actions[i]();
-				}
-				break;
-			}
-		}
-	}
-  /* USER CODE END StartHandlerTask */
-}
 
 /* USER CODE BEGIN Header_StartCAN_Task */
 /**
