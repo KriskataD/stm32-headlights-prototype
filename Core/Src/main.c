@@ -136,32 +136,6 @@ int main(void)
 
   /* USER CODE BEGIN Init */
 
-
-
-	headlights_GPIO highBeam = { GPIOA, GPIO_PIN_6 };
-	headlights_GPIO lowBeam = { GPIOA, GPIO_PIN_0 };
-	indicators_GPIO leftInd = { GPIOF, GPIO_PIN_12 };
-	indicators_GPIO rightInd = { GPIOA, GPIO_PIN_7 };
-
-	xHeadEventGroup = xEventGroupCreate();
-	xEventGroupSetBits(xHeadEventGroup, TEST_MODE_BIT);
-	EventBits_t uxBits = xEventGroupGetBits(xHeadEventGroup);
-	if ((uxBits & TEST_MODE_BIT) == TEST_MODE_BIT) //check if we are in test mode
-	    {
-			Headlights_Init_Test(highBeam, lowBeam);
-			Headlights_Updates_Test();
-			Headlights_Handle_Test();
-
-			Indicators_Init(leftInd, rightInd);
-			Indicators_Updates_Test();
-			Indicators_Handle_Test();
-	    }
-
-	Headlights_Init(highBeam, lowBeam);
-	Indicators_Init(leftInd, rightInd);
-
-	Queue_Handle = xQueueCreate(1, sizeof(InputEvt_t));
-
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -188,6 +162,30 @@ int main(void)
 
 	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
 	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
+
+	headlights_GPIO highBeam = { GPIOA, GPIO_PIN_6 };
+	headlights_GPIO lowBeam = { GPIOA, GPIO_PIN_0 };
+	indicators_GPIO leftInd = { GPIOF, GPIO_PIN_12 };
+	indicators_GPIO rightInd = { GPIOA, GPIO_PIN_7 };
+
+	xHeadEventGroup = xEventGroupCreate();
+	xEventGroupSetBits(xHeadEventGroup, TEST_MODE_BIT);
+	EventBits_t uxBits = xEventGroupGetBits(xHeadEventGroup);
+	if ((uxBits & TEST_MODE_BIT) == TEST_MODE_BIT) //check if we are in test mode
+	    {
+			Headlights_Init_Test(highBeam, lowBeam);
+			Headlights_Updates_Test();
+			Headlights_Handle_Test();
+
+			Indicators_Init(leftInd, rightInd);
+			Indicators_Updates_Test();
+			Indicators_Handle_Test();
+	    }
+
+	Headlights_Init(highBeam, lowBeam);
+	Indicators_Init(leftInd, rightInd);
+
+	Queue_Handle = xQueueCreate(1, sizeof(InputEvt_t));
 
 	updates[0] = Headlights_Updates;
 	updates[1] = Indicators_Update;
