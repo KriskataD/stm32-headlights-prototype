@@ -50,11 +50,11 @@ int16_t INA219_ReadCurrent(INA219_t *ina219)
 	return (result / ina219_currentDivider_mA );
 }
 
-uint16_t INA219_ReadShuntVolage(INA219_t *ina219)
+int32_t INA219_ReadShuntVolage(INA219_t *ina219)
 {
-	uint16_t result = Read16(ina219, INA219_REG_SHUNTVOLTAGE);
+	int16_t result = (int16_t)Read16(ina219, INA219_REG_SHUNTVOLTAGE);
 
-	return (result * 0.01 );
+	return ((int32_t)result * 10); // shunt voltage in microvolts (LSB = 10 uV, signed)
 }
 
 void INA219_Reset(INA219_t *ina219)

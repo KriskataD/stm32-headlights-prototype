@@ -118,7 +118,7 @@ INA219_t ina219;
 
 typedef struct {
 	uint16_t busVoltage_mV;   // bus voltage, LSB 4 mV
-	uint16_t shuntVoltage;    // shunt voltage, scaled
+	int32_t  shuntVoltage_uV; // shunt voltage in microvolts, LSB 10 uV, signed
 	int16_t  current_mA;      // current in mA
 } INA219_Readings_t;
 static volatile INA219_Readings_t ina219_readings;
@@ -869,7 +869,7 @@ void StartINA219_Task(void const * argument)
   for(;;)
   {
 	  ina219_readings.busVoltage_mV = INA219_ReadBusVoltage(&ina219);
-	  ina219_readings.shuntVoltage  = INA219_ReadShuntVolage(&ina219);
+	  ina219_readings.shuntVoltage_uV = INA219_ReadShuntVolage(&ina219);
 	  ina219_readings.current_mA    = INA219_ReadCurrent(&ina219);
 
 	  osDelay(500);
