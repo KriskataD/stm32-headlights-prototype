@@ -63,6 +63,7 @@ osThreadId UpdatesHandle;
 osThreadId HandlerHandle;
 osThreadId CANHandle;
 osThreadId INA219Handle;
+osThreadId IndicatorsHandle;
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -80,6 +81,7 @@ void StartUpdatesTask(void const * argument);
 void StartHandlerTask(void const * argument);
 void StartCAN_Task(void const * argument);
 void StartINA219_Task(void const * argument);
+void StartIndicators_Task(void const * argument);
 
 /* USER CODE BEGIN PFP */
 static void MX_CAN_Filter_Config(void);
@@ -191,9 +193,7 @@ int main(void)
 	Queue_Handle = xQueueCreate(1, sizeof(InputEvt_t));
 
 	updates[0] = Headlights_Updates;
-	updates[1] = Indicators_Update;
 	actions[0] = Headlights_Handle;
-	actions[1] = Indicators_Handle;
 
 	MX_CAN_Filter_Config();
 	HAL_CAN_Start(&hcan1);
@@ -245,6 +245,10 @@ int main(void)
   /* definition and creation of INA219 polling thread */
   osThreadDef(INA219, StartINA219_Task, osPriorityLow, 0, 128);
   INA219Handle = osThreadCreate(osThread(INA219), NULL);
+
+  /* definition and creation of indicator blink thread */
+  osThreadDef(Indicators, StartIndicators_Task, osPriorityNormal, 0, 128);
+  IndicatorsHandle = osThreadCreate(osThread(Indicators), NULL);
   /* USER CODE END RTOS_THREADS */
 
   /* Start scheduler */
@@ -741,15 +745,6 @@ void StartUpdatesTask(void const * argument)
 						xQueueSend(Queue_Handle, &eventSend, portMAX_DELAY);
 					}
 			}
-			else if (i == 1)
-			{
-					if (updates[i]())
-					{
-						eventSend.evt = INDICATORS;
-						eventSend.src = GPIO;
-						xQueueSend(Queue_Handle, &eventSend, portMAX_DELAY);
-					}
-			}
 
 		}
 
@@ -779,12 +774,6 @@ void StartHandlerTask(void const * argument)
 			{
 			case HEADLIGHTS:
 				if (i == 0)
-				{
-					actions[i]();
-				}
-				break;
-			case INDICATORS:
-				if (i == 1)
 				{
 					actions[i]();
 				}
@@ -875,6 +864,26 @@ void StartINA219_Task(void const * argument)
 	  osDelay(500);
   }
   /* USER CODE END StartINA219_Task */
+}
+
+/* USER CODE BEGIN Header_StartIndicators_Task */
+/**
+* @brief Function implementing the indicator blink thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartIndicators_Task */
+void StartIndicators_Task(void const * argument)
+{
+  /* USER CODE BEGIN StartIndicators_Task */
+  /* Infinite loop */
+  for(;;)
+  {
+	  Indicators_Update();   // sample the L/R switch inputs
+	  Indicators_Handle();   // toggle the active indicator(s)
+	  osDelay(100);          // fixed 100 ms blink cadence
+  }
+  /* USER CODE END StartIndicators_Task */
 }
 
 /**

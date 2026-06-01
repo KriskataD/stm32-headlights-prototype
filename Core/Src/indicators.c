@@ -76,16 +76,13 @@ void Indicators_Handle()
 		{
 			case LEFT:
 				HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_15);
-				osDelay(100);
 				break;
 			case RIGHT:
 				HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_13);
-				osDelay(100);
 				break;
 			case HAZARD:
 				HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_15);
 				HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_13);
-				osDelay(100);
 				break;
 			case NOSIGNALS:
 				HAL_GPIO_WritePin(GPIOE, GPIO_PIN_13, GPIO_PIN_RESET);
