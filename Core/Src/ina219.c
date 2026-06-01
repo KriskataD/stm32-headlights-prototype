@@ -44,6 +44,7 @@ int16_t INA219_ReadCurrent_raw(INA219_t *ina219)
 
 int16_t INA219_ReadCurrent(INA219_t *ina219)
 {
+	if (ina219_currentDivider_mA == 0) return 0;
 	int16_t result = INA219_ReadCurrent_raw(ina219);
 
 	return (result / ina219_currentDivider_mA );
