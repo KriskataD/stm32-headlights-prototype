@@ -30,7 +30,6 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "ina219.h"
-#include "i2c_ina219.h"
 
 /* USER CODE END Includes */
 
@@ -201,12 +200,6 @@ int main(void)
 	                            INA219_CONFIG_BADCRES_12BIT |
 	                            INA219_CONFIG_SADCRES_12BIT_1S_532US |
 	                            INA219_CONFIG_MODE_SANDBVOLT_CONTINUOUS);
-
-	//Enter the slave device in listen mode to check for requests by the master
-	if(HAL_I2C_EnableListen_IT(&hi2c1) != HAL_OK)
-	{
-		Error_Handler();
-	}
 
   /* USER CODE END 2 */
 

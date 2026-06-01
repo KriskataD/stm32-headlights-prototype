@@ -49,12 +49,10 @@ Core/
     headlights.c     — headlight state machine (high/low/off)
     indicators.c     — turn indicator blink logic
     ina219.c         — INA219 driver (read/write registers, calibration)
-    i2c_ina219.c     — I2C interrupt callbacks for INA219 communication
   Inc/
     headlights.h
     indicators.h
     ina219.h
-    i2c_ina219.h
 Drivers/            — STM32 HAL & CMSIS (generated)
 Middlewares/        — FreeRTOS (generated)
 ```
@@ -62,7 +60,7 @@ Middlewares/        — FreeRTOS (generated)
 ## Known Limitations
 
 - **No hardware available for testing.** This is a portfolio/prototype codebase. Logic has been reviewed for correctness but has not been validated on physical hardware.
-- The I2C driver mixes master-transmit and slave-receive callbacks in a way that reflects early-stage exploration; a production design would separate these roles cleanly.
+- The INA219 is read in master mode (`ina219.c`). The driver's master-mode read functions are present but not yet consumed by a runtime task; a periodic polling task is the natural next step.
 - A single accept-all CAN filter (ID=0, mask=0) is configured; all incoming IDs reach FIFO0 and are dispatched in software by `StdId`.
 - **PA0/PA6 are double-configured.** Both pins are set up as TIM2/TIM3 PWM input-capture channels (see `.ioc`) and are *also* read as digital GPIO in `headlights.c`. The intended role of these pins (beam-emission feedback vs. control input) isn't settled, so the conflicting GPIO read is left in place and flagged here rather than removed.
 - Stack sizes for FreeRTOS tasks (128 words each) are minimal and untested under load.

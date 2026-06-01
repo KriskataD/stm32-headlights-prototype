@@ -1,0 +1,19 @@
+# STM32CubeIDE build output
+/Debug/
+/Release/
+
+# STM32CubeIDE / Eclipse workspace metadata
+/.settings/
+/.mxproject
+*.launch
+
+# Compiled objects / build intermediates
+*.o
+*.d
+*.su
+*.cyclo
+*.elf
+*.bin
+*.hex
+*.map
+*.list
