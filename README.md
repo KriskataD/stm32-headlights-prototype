@@ -63,6 +63,5 @@ Middlewares/        — FreeRTOS (generated)
 
 - **No hardware available for testing.** This is a portfolio/prototype codebase. Logic has been reviewed for correctness but has not been validated on physical hardware.
 - The I2C driver mixes master-transmit and slave-receive callbacks in a way that reflects early-stage exploration; a production design would separate these roles cleanly.
-- `INA219_Init` returns a `uint8_t` success flag but `main.c` compares it against `HAL_OK` (0); the inverted polarity means the error branch is taken on success. This would be caught in hardware bring-up.
 - No CAN acceptance filter is configured, so the controller accepts all CAN IDs.
 - Stack sizes for FreeRTOS tasks (128 words each) are minimal and untested under load.
