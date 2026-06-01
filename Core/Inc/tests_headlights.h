@@ -2,7 +2,7 @@
  * tests.h
  *
  *  Created on: Jun 20, 2024
- *      Author: 35988
+ *      Author: Kristian Dimitrov
  */
 
 #ifndef INC_TESTS_HEADLIGHTS_H_

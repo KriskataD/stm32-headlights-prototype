@@ -2,7 +2,7 @@
  * tests_indicators.c
  *
  *  Created on: Jun 24, 2024
- *      Author: 35988
+ *      Author: Kristian Dimitrov
  */
 
 #include "tests_indicators.h"

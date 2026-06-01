@@ -2,7 +2,7 @@
  * tests_indicators.h
  *
  *  Created on: Jun 24, 2024
- *      Author: 35988
+ *      Author: Kristian Dimitrov
  */
 
 #ifndef INC_TESTS_INDICATORS_H_

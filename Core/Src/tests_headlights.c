@@ -2,7 +2,7 @@
  * tests.c
  *
  *  Created on: Jun 20, 2024
- *      Author: 35988
+ *      Author: Kristian Dimitrov
  */
 
 #include <tests_headlights.h>

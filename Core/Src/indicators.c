@@ -2,7 +2,7 @@
  * indicators.c
  *
  *  Created on: Jun 13, 2024
- *      Author: 35988
+ *      Author: Kristian Dimitrov
  */
 
 #include "indicators.h"

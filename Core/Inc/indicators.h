@@ -2,7 +2,7 @@
  * indicators.h
  *
  *  Created on: Jun 13, 2024
- *      Author: 35988
+ *      Author: Kristian Dimitrov
  */
 
 #ifndef INC_INDICATORS_H_

@@ -2,7 +2,7 @@
  * ina219.c
  *
  *  Created on: Jul 4, 2024
- *      Author: 35988
+ *      Author: Kristian Dimitrov
  */
 
 #include "ina219.h"
