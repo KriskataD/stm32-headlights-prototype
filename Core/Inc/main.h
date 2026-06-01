@@ -39,7 +39,7 @@ extern "C" {
 
 #define UPDATE_HANDLERS_SIZE 2
 #define ACTION_HANDLERS_SIZE 2
-#define TEST_MODE_BIT (1 << 0)
+#define RUN_BOOT_SELFTEST 1   /* 1 = run power-on lamp self-test, 0 = skip */
 #define CAN_ID_LOW 0x101
 #define CAN_ID_HIGH 0x102
 #define CAN_ID_OFF 0x103

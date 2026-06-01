@@ -112,7 +112,6 @@ typedef union
 }CAN_MessageData;
 
 static QueueHandle_t Queue_Handle = NULL;
-static EventGroupHandle_t xHeadEventGroup;
 
 INA219_t ina219;
 
@@ -168,19 +167,15 @@ int main(void)
 	indicators_GPIO leftInd = { GPIOF, GPIO_PIN_12 };
 	indicators_GPIO rightInd = { GPIOA, GPIO_PIN_7 };
 
-	xHeadEventGroup = xEventGroupCreate();
-	xEventGroupSetBits(xHeadEventGroup, TEST_MODE_BIT);
-	EventBits_t uxBits = xEventGroupGetBits(xHeadEventGroup);
-	if ((uxBits & TEST_MODE_BIT) == TEST_MODE_BIT) //check if we are in test mode
-	    {
-			Headlights_Init_Test(highBeam, lowBeam);
-			Headlights_Updates_Test();
-			Headlights_Handle_Test();
+#if RUN_BOOT_SELFTEST
+	Headlights_Init_Test(highBeam, lowBeam);
+	Headlights_Updates_Test();
+	Headlights_Handle_Test();
 
-			Indicators_Init(leftInd, rightInd);
-			Indicators_Updates_Test();
-			Indicators_Handle_Test();
-	    }
+	Indicators_Init(leftInd, rightInd);
+	Indicators_Updates_Test();
+	Indicators_Handle_Test();
+#endif
 
 	Headlights_Init(highBeam, lowBeam);
 	Indicators_Init(leftInd, rightInd);
@@ -729,7 +724,6 @@ void StartUpdatesTask(void const * argument)
   /* USER CODE BEGIN 5 */
 	/* Infinite loop */
 	for (;;) {
-		xEventGroupWaitBits(xHeadEventGroup, TEST_MODE_BIT, pdFALSE, pdFALSE, portMAX_DELAY);
 
 		InputEvt_t eventSend;
 		for (int i = 0; i < UPDATE_HANDLERS_SIZE; i++)
@@ -772,7 +766,6 @@ void StartHandlerTask(void const * argument)
   /* USER CODE BEGIN StartHandlerTask */
 	/* Infinite loop */
 	for (;;) {
-		xEventGroupWaitBits(xHeadEventGroup, TEST_MODE_BIT, pdFALSE, pdFALSE, portMAX_DELAY);
 
 		InputEvt_t eventReceive;
 		xQueueReceive(Queue_Handle, &eventReceive, 50);

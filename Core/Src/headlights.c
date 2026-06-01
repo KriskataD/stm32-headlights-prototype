@@ -25,14 +25,6 @@ bool Headlights_Updates()
 	switchBeamH = HAL_GPIO_ReadPin(switchHighGPIO.port, switchHighGPIO.pin); //pin D12
 	switchBeamL = HAL_GPIO_ReadPin(switchLowGPIO.port, switchLowGPIO.pin);
 
-//	EventBits_t uxBits = xEventGroupGetBits(xHeadEventGroup);
-//	uxBits = xEventGroupSetBits(xHeadEventGroup, TEST_MODE_BIT);
-//
-//	if ( (uxBits & TEST_MODE_BIT) == TEST_MODE_BIT) // check if test mode is enabled
-//		{
-//			Headlights_Updates_Test();
-//		}
-
 	if (switchBeamL == GPIO_PIN_RESET && switchBeamH == GPIO_PIN_RESET)
 		{
 			stateHead = OFF;
